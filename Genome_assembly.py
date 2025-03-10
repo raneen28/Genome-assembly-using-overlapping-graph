@@ -167,26 +167,12 @@ def basic_performance_metrics(contigs, reference):
     }
 
 
-# Example usage:
+
 def main():
-    """
-    Usage:
-      python naive_experiment.py <FASTA_FILE>
-
-    This script will:
-    1) Read the PhiX (or toy) genome from FASTA.
-    2) Define ranges for N, l, p.
-    3) For each combination, generate reads, build overlap graph, run assembly.
-    4) Output a summary table of performance.
-    """
-    if len(sys.argv) < 2:
-        print("Usage: python naive_experiment.py <FASTA_FILE>")
-        sys.exit(1)
-
     fasta_file = sys.argv[1]
     reference_genome = read_fasta(fasta_file)
     G = len(reference_genome)
-    print(f"[INFO] Loaded reference genome of length {G} from {fasta_file}")
+    print(f"Loaded reference genome of length {G} from {fasta_file}")
 
     # 1. Define parameter ranges for experimentation
 
@@ -195,30 +181,30 @@ def main():
     p_values = [0.0, 0.01]
     min_overlap = 10
 
-    # 2. Print table header
-    print("\n EXPERIMENT RESULTS (Naive Overlap Assembly)")
+  
+    print("\n RESULTS Naive Overlap Assembly")
     print("N\tl\tp\tCoverage\t#Contigs\tLongest\tTotalAsm\tTimeBuild(s)\tTimeAssemble(s)")
 
-    # 3. Loop over all combos of (N, l, p)
+    
     for (N, l, p) in itertools.product(N_values, l_values, p_values):
         coverage_est = compute_coverage(N, l, G)
 
-        # --- Generate reads ---
+        # Generate reads
         start_time = time.time()
         reads = generate_reads(reference_genome, N, l, p)
         gen_time = time.time() - start_time
 
-        # --- Build overlap graph (Naive O(N^2)) ---
+        # Build overlap graph
         start_time = time.time()
         graph = build_overlap_graph(reads, min_overlap=min_overlap)
         build_time = time.time() - start_time
 
-        # --- Greedy Assembly ---
+        # Greedy Assembly
         start_time = time.time()
         contigs = greedy_assemble(reads, min_overlap=min_overlap)
         assemble_time = time.time() - start_time
 
-        # --- Metrics ---
+        #Metrics
         metrics = basic_performance_metrics(contigs, reference_genome)
         num_contigs = metrics["num_contigs"]
         longest_contig = metrics["longest_contig"]
